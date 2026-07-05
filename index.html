@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Visor Fotovoltaico</title>
+
+<link rel="stylesheet" href="style.css">
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.166.1/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.166.1/examples/jsm/"
+  }
+}
+</script>
+
+</head>
+
+<body>
+
+<div id="sidebar">
+
+    <h2>Objetos</h2>
+
+    <button id="btnPaneles">
+        Arreglo Fotovoltaico
+    </button>
+
+    <button id="btnProtecciones">
+        Protecciones
+    </button>
+
+</div>
+
+
+<div id="viewer"></div>
+
+
+<div id="modal">
+
+    <span id="close">&times;</span>
+
+    <img id="imagen">
+
+</div>
+
+<script type="module" src="script.js"></script>
+
+</body>
+</html>
