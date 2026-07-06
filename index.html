@@ -1,14 +1,10 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Visor Fotovoltaico</title>
-
 <link rel="stylesheet" href="style.css">
-
 <script type="importmap">
 {
   "imports": {
@@ -17,38 +13,40 @@
   }
 }
 </script>
-
 </head>
-
 <body>
 
-<div id="sidebar">
+  <div id="topbar">
+    <span class="dot"></span>
+    <b>Visor Fotovoltaico</b>
+    <span class="crumb">/</span>
+    <span>Arreglo Fotovoltaico · vista 3D</span>
+  </div>
 
-    <h2>Objetos</h2>
+  <div id="body-layout">
+    <div id="sidebar">
+      <h2>Objetos del modelo</h2>
+      <button id="btnPaneles" data-code="OBJ·01">Arreglo Fotovoltaico</button>
+      <button id="btnProtecciones" data-code="OBJ·02">Protecciones</button>
+      <div class="hint">Clic en un objeto de la lista o directamente sobre el modelo 3D para ver su ficha técnica.</div>
+    </div>
 
-    <button id="btnPaneles">
-        Arreglo Fotovoltaico
-    </button>
+    <div id="viewer">
+      <div class="reticle tl"></div>
+      <div class="reticle tr"></div>
+      <div class="reticle bl"></div>
+      <div class="reticle br"></div>
+    </div>
+  </div>
 
-    <button id="btnProtecciones">
-        Protecciones
-    </button>
-
-</div>
-
-
-<div id="viewer"></div>
-
-
-<div id="modal">
-
+  <div id="modal">
     <span id="close">&times;</span>
+    <div id="modalFrame">
+      <div id="modalCaption"></div>
+      <img id="imagen">
+    </div>
+  </div>
 
-    <img id="imagen">
-
-</div>
-
-<script type="module" src="script.js"></script>
-
+  <script type="module" src="script.js"></script>
 </body>
 </html>
