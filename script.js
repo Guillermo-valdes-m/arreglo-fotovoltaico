@@ -6,7 +6,7 @@ const viewer = document.getElementById("viewer");
 
 // Escena
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xffffff);
+scene.background = null;
 
 // Cámara
 const camera = new THREE.PerspectiveCamera(
@@ -19,7 +19,8 @@ const camera = new THREE.PerspectiveCamera(
 camera.position.set(3, 3, 3);
 
 // Render
-const renderer = new THREE.WebGLRenderer({ antialias: true });
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setClearColor(0x000000, 0);
 renderer.setSize(viewer.clientWidth, viewer.clientHeight);
 viewer.appendChild(renderer.domElement);
 
@@ -117,9 +118,16 @@ document.getElementById("btnProtecciones").onclick = () => {
 const modal = document.getElementById("modal");
 const imagen = document.getElementById("imagen");
 
+const caption = document.getElementById("modalCaption");
+const titulos = {
+    "img/paneles.png": "OBJ·01 — Arreglo Fotovoltaico",
+    "img/Protecciones.png": "OBJ·02 — Protecciones"
+};
+
 function abrirImagen(ruta) {
 
     imagen.src = ruta;
+    caption.textContent = titulos[ruta] || "";
 
     modal.style.display = "flex";
 
