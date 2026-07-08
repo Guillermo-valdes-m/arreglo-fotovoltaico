@@ -6,7 +6,7 @@ const viewer = document.getElementById("viewer");
 
 // Escena
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x0A1620);
+scene.background = new THREE.Color(0x1C3A52);
 
 // Cámara
 const camera = new THREE.PerspectiveCamera(
