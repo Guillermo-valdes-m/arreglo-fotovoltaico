@@ -132,6 +132,16 @@ body{
   border-color: var(--amber);
 }
 
+#sidebar button:disabled{
+  opacity:.45;
+  cursor:wait;
+}
+#sidebar button:disabled:hover{
+  background: var(--panel-row);
+  border-left:2px solid transparent;
+  color: var(--text);
+}
+
 #sidebar .hint{
   margin-top:16px;
   font-family:'IBM Plex Mono', monospace;
