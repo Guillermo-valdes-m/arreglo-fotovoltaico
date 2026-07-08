@@ -6,7 +6,7 @@ const viewer = document.getElementById("viewer");
 
 // Escena
 const scene = new THREE.Scene();
-scene.background = null;
+scene.background = new THREE.Color(0x0A1620);
 
 // Cámara
 const camera = new THREE.PerspectiveCamera(
@@ -19,8 +19,7 @@ const camera = new THREE.PerspectiveCamera(
 camera.position.set(3, 3, 3);
 
 // Render
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-renderer.setClearColor(0x000000, 0);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(viewer.clientWidth, viewer.clientHeight);
 viewer.appendChild(renderer.domElement);
 
