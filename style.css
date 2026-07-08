@@ -1,222 +1,237 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
-:root{
-  --bg: #0A1620;
-  --panel: #0F1E2C;
-  --panel-row: #142B3D;
-  --line: #22394D;
-  --amber: #FFB020;
-  --cyan: #4FD1E8;
-  --text: #E7EEF3;
-  --text-dim: #7C93A6;
-}
+const viewer = document.getElementById("viewer");
 
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
+// Escena
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x1C3A52);
 
-body{
-  display:flex;
-  flex-direction: column;
-  height:100vh;
-  font-family:'IBM Plex Sans', Arial, Helvetica, sans-serif;
-  overflow:hidden;
-  background: var(--bg);
-  color: var(--text);
-}
+// Cámara
+const camera = new THREE.PerspectiveCamera(
+    60,
+    viewer.clientWidth / viewer.clientHeight,
+    0.1,
+    1000
+);
 
-/* ---------- Barra superior ---------- */
-#topbar{
-  height:44px;
-  flex-shrink:0;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:0 18px;
-  background: var(--panel);
-  border-bottom:1px solid var(--line);
-  font-family:'IBM Plex Mono', monospace;
-  font-size:12px;
-  letter-spacing:.04em;
-  color: var(--text-dim);
-}
-#topbar .dot{
-  width:7px; height:7px; border-radius:50%;
-  background: var(--amber);
-  box-shadow: 0 0 6px var(--amber);
-}
-#topbar b{
-  color: var(--text);
-  font-weight:600;
-  letter-spacing:.02em;
-}
-#topbar .crumb{ color: var(--cyan); }
+camera.position.set(3, 3, 3);
 
-/* ---------- Cuerpo ---------- */
-#body-layout{
-  flex:1;
-  display:flex;
-  min-height:0;
-}
+// Render
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(viewer.clientWidth, viewer.clientHeight);
+viewer.appendChild(renderer.domElement);
 
-/* ---------- Sidebar tipo "outliner" de CAD ---------- */
-#sidebar{
-  width:250px;
-  flex-shrink:0;
-  background: var(--panel);
-  border-right:1px solid var(--line);
-  padding:18px 14px;
-  overflow-y:auto;
-}
+// Controles
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
 
-#sidebar h2{
-  font-family:'IBM Plex Mono', monospace;
-  font-size:11px;
-  font-weight:600;
-  letter-spacing:.14em;
-  text-transform:uppercase;
-  color: var(--cyan);
-  margin-bottom:14px;
-  padding-bottom:10px;
-  border-bottom:1px dashed var(--line);
-}
+// Luces
+scene.add(new THREE.AmbientLight(0xffffff, 3.5));
 
-#sidebar button{
-  width:100%;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  text-align:left;
-  padding:11px 10px;
-  margin-bottom:8px;
-  border:1px solid var(--line);
-  border-left:2px solid transparent;
-  background: var(--panel-row);
-  color: var(--text);
-  font-family:'IBM Plex Sans', sans-serif;
-  font-size:13.5px;
-  cursor:pointer;
-  border-radius:3px;
-  transition: all .15s ease;
+const light = new THREE.DirectionalLight(0xffffff, 2);
+light.position.set(5, 10, 5);
+scene.add(light);
+
+const fillLight = new THREE.DirectionalLight(0xffffff, 1.2);
+fillLight.position.set(-5, 4, -5);
+scene.add(fillLight);
+
+// Variables
+let modelo;
+const objetos = {};
+
+// Cargar modelo
+const loader = new GLTFLoader();
+
+loader.load(
+
+    "modelo/Arreglo fotovoltaico.glb",
+
+    (gltf) => {
+
+        modelo = gltf.scene;
+
+        scene.add(modelo);
+
+        console.log("Modelo cargado");
+
+        modelo.traverse((obj) => {
+
+            if (obj.isMesh) {
+
+                console.log(obj.name);
+
+                objetos[obj.name] = obj;
+
+                if (obj.name === "OBJETO.002") {
+
+                    obj.material = obj.material.clone();
+                    obj.material.emissive = new THREE.Color(0xffffff);
+                    obj.material.emissiveIntensity = 0.5;
+
+                }
+
+            }
+
+        });
+
+    }
+
+);
+
+// Enfocar cámara en un objeto por nombre
+function enfocarObjeto(nombre) {
+
+    const obj = objetos[nombre];
+
+    if (!obj) return;
+
+    const box = new THREE.Box3().setFromObject(obj);
+    const centro = box.getCenter(new THREE.Vector3());
+    const tamano = box.getSize(new THREE.Vector3());
+    const radio = Math.max(tamano.length() * 0.6, 1);
+
+    const direccion = new THREE.Vector3(1, 0.8, 1).normalize();
+    const posDestino = centro.clone().add(direccion.multiplyScalar(radio));
+
+    animarCamara(posDestino, centro);
+
 }
 
-#sidebar button::before{
-  content: attr(data-code);
-  font-family:'IBM Plex Mono', monospace;
-  font-size:10px;
-  color: var(--text-dim);
-  background: rgba(255,255,255,0.04);
-  border:1px solid var(--line);
-  border-radius:2px;
-  padding:2px 5px;
-  flex-shrink:0;
+// Animación suave de cámara hacia una posición/objetivo
+function animarCamara(posDestino, targetDestino) {
+
+    const posInicial = camera.position.clone();
+    const targetInicial = controls.target.clone();
+    const duracion = 700;
+    const inicio = performance.now();
+
+    function paso(ahora) {
+
+        const p = Math.min((ahora - inicio) / duracion, 1);
+        const ease = 1 - Math.pow(1 - p, 3);
+
+        camera.position.lerpVectors(posInicial, posDestino, ease);
+        controls.target.lerpVectors(targetInicial, targetDestino, ease);
+        controls.update();
+
+        if (p < 1) requestAnimationFrame(paso);
+
+    }
+
+    requestAnimationFrame(paso);
+
 }
 
-#sidebar button:hover{
-  background: #1A3448;
-  border-left:2px solid var(--amber);
-  color: var(--amber);
+// Raycaster
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
+// Click sobre el modelo
+renderer.domElement.addEventListener("click", (event) => {
+
+    mouse.x = (event.offsetX / renderer.domElement.clientWidth) * 2 - 1;
+    mouse.y = -(event.offsetY / renderer.domElement.clientHeight) * 2 + 1;
+
+    raycaster.setFromCamera(mouse, camera);
+
+    const hits = raycaster.intersectObjects(scene.children, true);
+
+    if (hits.length === 0) return;
+
+    const nombre = hits[0].object.name;
+
+    console.log(nombre);
+
+    if (nombre === "OBJETO") {
+
+        abrirImagen("img/paneles.png");
+        enfocarObjeto("OBJETO");
+
+    }
+
+    if (nombre === "OBJETO.002") {
+
+        abrirImagen("img/Protecciones.png");
+        enfocarObjeto("OBJETO.002");
+
+    }
+
+});
+
+// Botones laterales
+document.getElementById("btnPaneles").onclick = () => {
+
+    abrirImagen("img/paneles.png");
+    enfocarObjeto("OBJETO");
+
+};
+
+document.getElementById("btnProtecciones").onclick = () => {
+
+    abrirImagen("img/Protecciones.png");
+    enfocarObjeto("OBJETO.002");
+
+};
+
+// Panel lateral
+const infoPanel = document.getElementById("infoPanel");
+const imagen = document.getElementById("imagen");
+const caption = document.getElementById("infoPanelCaption");
+
+const titulos = {
+    "img/paneles.png": "OBJ·01 — Arreglo Fotovoltaico",
+    "img/Protecciones.png": "OBJ·02 — Protecciones"
+};
+
+function abrirImagen(ruta) {
+
+    imagen.src = ruta;
+    caption.textContent = titulos[ruta] || "";
+
+    infoPanel.classList.add("active");
+
 }
 
-#sidebar button:hover::before{
-  color: var(--amber);
-  border-color: var(--amber);
+function cerrarPanel() {
+
+    infoPanel.classList.remove("active");
+
 }
 
-#sidebar .hint{
-  margin-top:16px;
-  font-family:'IBM Plex Mono', monospace;
-  font-size:10.5px;
-  line-height:1.6;
-  color: var(--text-dim);
-  border-left:2px solid var(--line);
-  padding-left:8px;
+document.getElementById("close").onclick = cerrarPanel;
+
+// El ancho del visor cambia al abrir/cerrar el panel: reajustar cámara y render
+infoPanel.addEventListener("transitionend", (e) => {
+
+    if (e.propertyName === "width") actualizarTamano();
+
+});
+
+// Render
+function animate() {
+
+    requestAnimationFrame(animate);
+
+    controls.update();
+
+    renderer.render(scene, camera);
+
 }
 
-/* ---------- Visor 3D ---------- */
-#viewer{
-  flex:1;
-  position:relative;
-  background: var(--bg);
+animate();
+
+// Responsive
+function actualizarTamano() {
+
+    camera.aspect = viewer.clientWidth / viewer.clientHeight;
+
+    camera.updateProjectionMatrix();
+
+    renderer.setSize(viewer.clientWidth, viewer.clientHeight);
+
 }
 
-canvas{
-  display:block;
-}
-
-/* esquinas tipo visor/retícula */
-#viewer::before, #viewer::after,
-#viewer .corner-tl, #viewer .corner-br{
-  content:"";
-}
-
-.reticle{
-  position:absolute;
-  width:22px;
-  height:22px;
-  border-color: var(--cyan);
-  opacity:.55;
-  pointer-events:none;
-}
-.reticle.tl{ top:12px; left:12px; border-top:2px solid var(--cyan); border-left:2px solid var(--cyan); }
-.reticle.tr{ top:12px; right:12px; border-top:2px solid var(--cyan); border-right:2px solid var(--cyan); }
-.reticle.bl{ bottom:12px; left:12px; border-bottom:2px solid var(--cyan); border-left:2px solid var(--cyan); }
-.reticle.br{ bottom:12px; right:12px; border-bottom:2px solid var(--cyan); border-right:2px solid var(--cyan); }
-
-/* ---------- Modal / ficha técnica ---------- */
-#modal{
-  display:none;
-  position:fixed;
-  top:0; left:0;
-  width:100%;
-  height:100%;
-  background: rgba(11, 236, 187, 0.52);
-  backdrop-filter: blur(3px);
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-  z-index:10;
-}
-
-#modalFrame{
-  display:flex;
-  flex-direction:column;
-  max-width:92%;
-  max-height:88%;
-}
-
-#modalCaption{
-  font-family:'IBM Plex Mono', monospace;
-  font-size:11.5px;
-  color: var(--cyan);
-  letter-spacing:.06em;
-  padding:8px 4px;
-  border-bottom:1px solid var(--line);
-  margin-bottom:0;
-}
-
-#modal img{
-  max-width:100%;
-  max-height:78vh;
-  border:1px solid var(--line);
-  border-top:none;
-  box-shadow: 0 0 40px rgba(0,0,0,.6);
-  background: #fff;
-}
-
-#close{
-  position:absolute;
-  top:18px;
-  right:26px;
-  color: var(--text-dim);
-  font-size:32px;
-  line-height:1;
-  cursor:pointer;
-  user-select:none;
-  transition: color .15s ease;
-}
-#close:hover{
-  color: var(--amber);
-}
+window.addEventListener("resize", actualizarTamano);
