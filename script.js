@@ -68,7 +68,7 @@ loader.load(
 
                 objetos[obj.name] = obj;
 
-                if (obj.name === "OBJETO.002") {
+                if (obj.name === "Objeto.002") {
 
                     obj.material = obj.material.clone();
                     obj.material.emissive = new THREE.Color(0xffffff);
@@ -179,7 +179,7 @@ btnProtecciones.disabled = true;
 btnPaneles.onclick = () => {
 
     abrirImagen("img/paneles.png");
-    enfocarObjeto("OBJETO");
+    enfocarObjeto("Objeto");
 
 };
 
