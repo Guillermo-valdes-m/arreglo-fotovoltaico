@@ -62,6 +62,14 @@ loader.load(
 
                 console.log(obj.name);
 
+                if (obj.name === "OBJETO.002") {
+
+                    obj.material = obj.material.clone();
+                    obj.material.emissive = new THREE.Color(0xffffff);
+                    obj.material.emissiveIntensity = 0.5;
+
+                }
+
             }
 
         });
