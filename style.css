@@ -139,11 +139,7 @@ body{
 #viewer{
   flex:1;
   position:relative;
-  background:
-    linear-gradient(var(--line) 1px, transparent 1px) 0 0 / 32px 32px,
-    linear-gradient(90deg, var(--line) 1px, transparent 1px) 0 0 / 32px 32px,
-    var(--bg);
-  background-blend-mode: overlay, overlay, normal;
+  background: var(--bg);
 }
 
 canvas{
