@@ -16,7 +16,7 @@ const camera = new THREE.PerspectiveCamera(
     1000
 );
 
-camera.position.set(15, 15, 15);
+camera.position.set(3, 3, 3);
 
 // Render
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -148,12 +148,14 @@ renderer.domElement.addEventListener("click", (event) => {
     if (nombre === "OBJETO") {
 
         abrirImagen("img/paneles.png");
+        enfocarObjeto("OBJETO");
 
     }
 
     if (nombre === "OBJETO.002") {
 
         abrirImagen("img/Protecciones.png");
+        enfocarObjeto("OBJETO.002");
 
     }
 
@@ -174,11 +176,11 @@ document.getElementById("btnProtecciones").onclick = () => {
 
 };
 
-// Modal
-const modal = document.getElementById("modal");
+// Panel lateral
+const infoPanel = document.getElementById("infoPanel");
 const imagen = document.getElementById("imagen");
+const caption = document.getElementById("infoPanelCaption");
 
-const caption = document.getElementById("modalCaption");
 const titulos = {
     "img/paneles.png": "OBJ·01 — Arreglo Fotovoltaico",
     "img/Protecciones.png": "OBJ·02 — Protecciones"
@@ -189,25 +191,24 @@ function abrirImagen(ruta) {
     imagen.src = ruta;
     caption.textContent = titulos[ruta] || "";
 
-    modal.style.display = "flex";
+    infoPanel.classList.add("active");
 
 }
 
-document.getElementById("close").onclick = () => {
+function cerrarPanel() {
 
-    modal.style.display = "none";
+    infoPanel.classList.remove("active");
 
-};
+}
 
-modal.onclick = (e) => {
+document.getElementById("close").onclick = cerrarPanel;
 
-    if (e.target === modal) {
+// El ancho del visor cambia al abrir/cerrar el panel: reajustar cámara y render
+infoPanel.addEventListener("transitionend", (e) => {
 
-        modal.style.display = "none";
+    if (e.propertyName === "width") actualizarTamano();
 
-    }
-
-};
+});
 
 // Render
 function animate() {
@@ -223,7 +224,7 @@ function animate() {
 animate();
 
 // Responsive
-window.addEventListener("resize", () => {
+function actualizarTamano() {
 
     camera.aspect = viewer.clientWidth / viewer.clientHeight;
 
@@ -231,4 +232,6 @@ window.addEventListener("resize", () => {
 
     renderer.setSize(viewer.clientWidth, viewer.clientHeight);
 
-});
+}
+
+window.addEventListener("resize", actualizarTamano);
