@@ -16,7 +16,7 @@ const camera = new THREE.PerspectiveCamera(
     1000
 );
 
-camera.position.set(3, 3, 3);
+camera.position.set(15, 15, 15);
 
 // Render
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -203,10 +203,10 @@ function cerrarPanel() {
 
 document.getElementById("close").onclick = cerrarPanel;
 
-// El ancho del visor cambia al abrir/cerrar el panel: reajustar cámara y render
+// El alto del visor cambia al abrir/cerrar el panel: reajustar cámara y render
 infoPanel.addEventListener("transitionend", (e) => {
 
-    if (e.propertyName === "width") actualizarTamano();
+    if (e.propertyName === "height") actualizarTamano();
 
 });
 
