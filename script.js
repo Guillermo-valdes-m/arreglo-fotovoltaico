@@ -153,17 +153,17 @@ renderer.domElement.addEventListener("click", (event) => {
 
     console.log(nombre);
 
-    if (nombre === "OBJETO") {
+    if (nombre === "Objeto") {
 
         abrirImagen("img/paneles.png");
-        enfocarObjeto("OBJETO");
+        enfocarObjeto("Objeto");
 
     }
 
-    if (nombre === "OBJETO.002") {
+    if (nombre === "Objeto.002") {
 
         abrirImagen("img/Protecciones.png");
-        enfocarObjeto("OBJETO.002");
+        enfocarObjeto("Objeto.002");
 
     }
 
