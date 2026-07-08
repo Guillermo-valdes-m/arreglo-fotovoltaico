@@ -57,6 +57,9 @@ loader.load(
 
         console.log("Modelo cargado");
 
+        btnPaneles.disabled = false;
+        btnProtecciones.disabled = false;
+
         modelo.traverse((obj) => {
 
             if (obj.isMesh) {
@@ -86,7 +89,12 @@ function enfocarObjeto(nombre) {
 
     const obj = objetos[nombre];
 
-    if (!obj) return;
+    if (!obj) {
+
+        console.warn(`enfocarObjeto: "${nombre}" no encontrado todavía (¿el modelo ya terminó de cargar?)`);
+        return;
+
+    }
 
     const box = new THREE.Box3().setFromObject(obj);
     const centro = box.getCenter(new THREE.Vector3());
@@ -162,14 +170,20 @@ renderer.domElement.addEventListener("click", (event) => {
 });
 
 // Botones laterales
-document.getElementById("btnPaneles").onclick = () => {
+const btnPaneles = document.getElementById("btnPaneles");
+const btnProtecciones = document.getElementById("btnProtecciones");
+
+btnPaneles.disabled = true;
+btnProtecciones.disabled = true;
+
+btnPaneles.onclick = () => {
 
     abrirImagen("img/paneles.png");
     enfocarObjeto("OBJETO");
 
 };
 
-document.getElementById("btnProtecciones").onclick = () => {
+btnProtecciones.onclick = () => {
 
     abrirImagen("img/Protecciones.png");
     enfocarObjeto("OBJETO.002");
