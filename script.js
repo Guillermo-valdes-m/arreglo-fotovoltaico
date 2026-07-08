@@ -16,7 +16,7 @@ const camera = new THREE.PerspectiveCamera(
     1000
 );
 
-camera.position.set(10, 10, 10);
+camera.position.set(3, 3, 3);
 
 // Render
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -40,6 +40,7 @@ scene.add(fillLight);
 
 // Variables
 let modelo;
+const objetos = {};
 
 // Cargar modelo
 const loader = new GLTFLoader();
@@ -62,6 +63,8 @@ loader.load(
 
                 console.log(obj.name);
 
+                objetos[obj.name] = obj;
+
                 if (obj.name === "OBJETO.002") {
 
                     obj.material = obj.material.clone();
@@ -77,6 +80,50 @@ loader.load(
     }
 
 );
+
+// Enfocar cámara en un objeto por nombre
+function enfocarObjeto(nombre) {
+
+    const obj = objetos[nombre];
+
+    if (!obj) return;
+
+    const box = new THREE.Box3().setFromObject(obj);
+    const centro = box.getCenter(new THREE.Vector3());
+    const tamano = box.getSize(new THREE.Vector3());
+    const radio = Math.max(tamano.length() * 0.6, 1);
+
+    const direccion = new THREE.Vector3(1, 0.8, 1).normalize();
+    const posDestino = centro.clone().add(direccion.multiplyScalar(radio));
+
+    animarCamara(posDestino, centro);
+
+}
+
+// Animación suave de cámara hacia una posición/objetivo
+function animarCamara(posDestino, targetDestino) {
+
+    const posInicial = camera.position.clone();
+    const targetInicial = controls.target.clone();
+    const duracion = 700;
+    const inicio = performance.now();
+
+    function paso(ahora) {
+
+        const p = Math.min((ahora - inicio) / duracion, 1);
+        const ease = 1 - Math.pow(1 - p, 3);
+
+        camera.position.lerpVectors(posInicial, posDestino, ease);
+        controls.target.lerpVectors(targetInicial, targetDestino, ease);
+        controls.update();
+
+        if (p < 1) requestAnimationFrame(paso);
+
+    }
+
+    requestAnimationFrame(paso);
+
+}
 
 // Raycaster
 const raycaster = new THREE.Raycaster();
@@ -116,12 +163,14 @@ renderer.domElement.addEventListener("click", (event) => {
 document.getElementById("btnPaneles").onclick = () => {
 
     abrirImagen("img/paneles.png");
+    enfocarObjeto("OBJETO");
 
 };
 
 document.getElementById("btnProtecciones").onclick = () => {
 
     abrirImagen("img/Protecciones.png");
+    enfocarObjeto("OBJETO.002");
 
 };
 
