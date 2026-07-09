@@ -43,17 +43,25 @@ let modelo;
 const objetos = {};
 
 // Grupos de mallas (reflejan las colecciones "paneles" y "Tableros" de Blender,
-// que no se exportan como agrupadores en el .glb, así que se listan a mano)
+// que no se exportan como agrupadores en el .glb, así que se listan a mano).
+// "direccion" controla desde qué lado se aproxima la cámara al hacer zoom:
+// ajustá el signo de cada eje si la cámara llega "del lado incorrecto".
 const GRUPOS = {
-    paneles: ["Panel 1", "Panel 2", "Panel 3", "Panel 4", "Panel 5", "Panel 6"],
-    tableros: ["Inversor", "Medidor", "Protecciones CA", "Protecciones CC", "Tablero General"]
+    paneles: {
+        nombres: ["Panel 1", "Panel 2", "Panel 3", "Panel 4", "Panel 5", "Panel 6"],
+        direccion: new THREE.Vector3(1, 0.8, 1)
+    },
+    tableros: {
+        nombres: ["Inversor", "Medidor", "Protecciones CA", "Protecciones CC", "Tablero General"],
+        direccion: new THREE.Vector3(-1, 0.8, -1)
+    }
 };
 
 function grupoDe(nombre) {
 
-    for (const [clave, lista] of Object.entries(GRUPOS)) {
+    for (const [clave, grupo] of Object.entries(GRUPOS)) {
 
-        if (lista.includes(nombre)) return clave;
+        if (grupo.nombres.includes(nombre)) return clave;
 
     }
 
@@ -104,14 +112,14 @@ loader.load(
 );
 
 // Enfocar cámara en un objeto por nombre
-function enfocarObjeto(nombre) {
+function enfocarObjeto(nombre, direccion) {
 
-    enfocarGrupo([nombre]);
+    enfocarGrupo([nombre], direccion);
 
 }
 
 // Enfocar cámara para encuadrar un grupo completo de objetos
-function enfocarGrupo(nombres) {
+function enfocarGrupo(nombres, direccion) {
 
     const box = new THREE.Box3();
     let encontrados = 0;
@@ -131,7 +139,7 @@ function enfocarGrupo(nombres) {
 
     if (encontrados === 0) {
 
-        console.warn(`enfocarGrupo: ninguno de estos objetos existe todavía: ${nombres.join(", ")} (¿el modelo ya terminó de cargar?)`);
+        console.warn(`enfocarGrupo: ninguno de estos objetos existe todavía: ${nombres.join(", ")} (¿el modelo ya terminó de cargar? revisá que el nombre coincida exactamente con la lista impresa arriba en consola)`);
         return;
 
     }
@@ -140,8 +148,8 @@ function enfocarGrupo(nombres) {
     const tamano = box.getSize(new THREE.Vector3());
     const radio = Math.max(tamano.length() * 0.6, 1);
 
-    const direccion = new THREE.Vector3(1, 0.8, 1).normalize();
-    const posDestino = centro.clone().add(direccion.multiplyScalar(radio));
+    const dir = (direccion || new THREE.Vector3(1, 0.8, 1)).clone().normalize();
+    const posDestino = centro.clone().add(dir.multiplyScalar(radio));
 
     animarCamara(posDestino, centro);
 
@@ -197,14 +205,14 @@ renderer.domElement.addEventListener("click", (event) => {
     if (clave === "paneles") {
 
         abrirImagen("img/paneles.png");
-        enfocarGrupo(GRUPOS.paneles);
+        enfocarGrupo(GRUPOS.paneles.nombres, GRUPOS.paneles.direccion);
 
     }
 
     if (clave === "tableros") {
 
         abrirImagen("img/Protecciones.png");
-        enfocarGrupo(GRUPOS.tableros);
+        enfocarGrupo(GRUPOS.tableros.nombres, GRUPOS.tableros.direccion);
 
     }
 
@@ -220,14 +228,14 @@ btnProtecciones.disabled = true;
 btnPaneles.onclick = () => {
 
     abrirImagen("img/paneles.png");
-    enfocarGrupo(GRUPOS.paneles);
+    enfocarGrupo(GRUPOS.paneles.nombres, GRUPOS.paneles.direccion);
 
 };
 
 btnProtecciones.onclick = () => {
 
     abrirImagen("img/Protecciones.png");
-    enfocarGrupo(GRUPOS.tableros);
+    enfocarGrupo(GRUPOS.tableros.nombres, GRUPOS.tableros.direccion);
 
 };
 
