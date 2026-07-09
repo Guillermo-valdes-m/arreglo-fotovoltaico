@@ -16,7 +16,7 @@ const camera = new THREE.PerspectiveCamera(
     1000
 );
 
-camera.position.set(20, 20, 20);
+camera.position.set(3, 3, 3);
 
 // Render
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -63,7 +63,7 @@ const GRUPOS = {
             "panel1", "panel2", "panel3", "panel4", "panel5", "panel6",
             "fu001001", "fu001002", "fu001003", "fu001004", "fu001005", "fu001006"
         ],
-        direccion: new THREE.Vector3(1, 0.8, 1)
+        direccion: new THREE.Vector3(-1, 0.8, -1)
     },
     tableros: {
         base: ["inversor", "medidor", "proteccionesca", "proteccionescc", "tablerogeneral"],
@@ -169,7 +169,7 @@ function enfocarGrupo(nombres, direccion) {
 
     const centro = box.getCenter(new THREE.Vector3());
     const tamano = box.getSize(new THREE.Vector3());
-    const radio = Math.max(tamano.length() * 0.6, 1);
+    const radio = Math.max(tamano.length() * 0.42, 0.7);
 
     const dir = (direccion || new THREE.Vector3(1, 0.8, 1)).clone().normalize();
     const posDestino = centro.clone().add(dir.multiplyScalar(radio));
