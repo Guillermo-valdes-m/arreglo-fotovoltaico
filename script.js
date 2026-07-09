@@ -153,17 +153,17 @@ renderer.domElement.addEventListener("click", (event) => {
 
     console.log(nombre);
 
-    if (nombre === "Objeto") {
+    if (nombre === "Objeto_01") {
 
         abrirImagen("img/paneles.png");
-        enfocarObjeto("Objeto");
+        enfocarObjeto("Objeto_01");
 
     }
 
-    if (nombre === "Objeto.002") {
+    if (nombre === "Objeto001") {
 
         abrirImagen("img/Protecciones.png");
-        enfocarObjeto("Objeto.002");
+        enfocarObjeto("Objeto001");
 
     }
 
@@ -179,14 +179,14 @@ btnProtecciones.disabled = true;
 btnPaneles.onclick = () => {
 
     abrirImagen("img/paneles.png");
-    enfocarObjeto("Objeto");
+    enfocarObjeto("Objeto_1");
 
 };
 
 btnProtecciones.onclick = () => {
 
     abrirImagen("img/Protecciones.png");
-    enfocarObjeto("OBJETO.002");
+    enfocarObjeto("Objeto001");
 
 };
 
