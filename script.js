@@ -42,6 +42,25 @@ scene.add(fillLight);
 let modelo;
 const objetos = {};
 
+// Grupos de mallas (reflejan las colecciones "paneles" y "Tableros" de Blender,
+// que no se exportan como agrupadores en el .glb, así que se listan a mano)
+const GRUPOS = {
+    paneles: ["Panel 1", "Panel 2", "Panel 3", "Panel 4", "Panel 5", "Panel 6"],
+    tableros: ["Inversor", "Medidor", "Protecciones CA", "Protecciones CC", "Tablero General"]
+};
+
+function grupoDe(nombre) {
+
+    for (const [clave, lista] of Object.entries(GRUPOS)) {
+
+        if (lista.includes(nombre)) return clave;
+
+    }
+
+    return null;
+
+}
+
 // Cargar modelo
 const loader = new GLTFLoader();
 
@@ -68,7 +87,7 @@ loader.load(
 
                 objetos[obj.name] = obj;
 
-                if (obj.name === "FU - 001.010") {
+                if (grupoDe(obj.name) === "tableros") {
 
                     obj.material = obj.material.clone();
                     obj.material.emissive = new THREE.Color(0xffffff);
@@ -87,16 +106,36 @@ loader.load(
 // Enfocar cámara en un objeto por nombre
 function enfocarObjeto(nombre) {
 
-    const obj = objetos[nombre];
+    enfocarGrupo([nombre]);
 
-    if (!obj) {
+}
 
-        console.warn(`enfocarObjeto: "${nombre}" no encontrado todavía (¿el modelo ya terminó de cargar?)`);
+// Enfocar cámara para encuadrar un grupo completo de objetos
+function enfocarGrupo(nombres) {
+
+    const box = new THREE.Box3();
+    let encontrados = 0;
+
+    nombres.forEach((nombre) => {
+
+        const obj = objetos[nombre];
+
+        if (obj) {
+
+            box.expandByObject(obj);
+            encontrados++;
+
+        }
+
+    });
+
+    if (encontrados === 0) {
+
+        console.warn(`enfocarGrupo: ninguno de estos objetos existe todavía: ${nombres.join(", ")} (¿el modelo ya terminó de cargar?)`);
         return;
 
     }
 
-    const box = new THREE.Box3().setFromObject(obj);
     const centro = box.getCenter(new THREE.Vector3());
     const tamano = box.getSize(new THREE.Vector3());
     const radio = Math.max(tamano.length() * 0.6, 1);
@@ -153,17 +192,19 @@ renderer.domElement.addEventListener("click", (event) => {
 
     console.log(nombre);
 
-    if (nombre === "FU - 001.006") {
+    const clave = grupoDe(nombre);
+
+    if (clave === "paneles") {
 
         abrirImagen("img/paneles.png");
-        enfocarObjeto("FU - 001.006");
+        enfocarGrupo(GRUPOS.paneles);
 
     }
 
-    if (nombre === "FU - 001.010") {
+    if (clave === "tableros") {
 
         abrirImagen("img/Protecciones.png");
-        enfocarObjeto("FU - 001.010");
+        enfocarGrupo(GRUPOS.tableros);
 
     }
 
@@ -179,14 +220,14 @@ btnProtecciones.disabled = true;
 btnPaneles.onclick = () => {
 
     abrirImagen("img/paneles.png");
-    enfocarObjeto("FU - 001.006");
+    enfocarGrupo(GRUPOS.paneles);
 
 };
 
 btnProtecciones.onclick = () => {
 
     abrirImagen("img/Protecciones.png");
-    enfocarObjeto("FU - 001.010");
+    enfocarGrupo(GRUPOS.tableros);
 
 };
 
