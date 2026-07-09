@@ -16,7 +16,7 @@ const camera = new THREE.PerspectiveCamera(
     1000
 );
 
-camera.position.set(3, 3, 3);
+camera.position.set(20, 20, 20);
 
 // Render
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -42,30 +42,53 @@ scene.add(fillLight);
 let modelo;
 const objetos = {};
 
+// Normaliza nombres para comparar sin importar espacios, guiones, puntos,
+// guiones bajos, mayúsculas, o sufijos "_1"/"_2" que agrega el exportador
+// cuando una malla tiene varios materiales.
+function normalizar(s) {
+
+    return (s || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+
+}
+
 // Grupos de mallas (reflejan las colecciones "paneles" y "Tableros" de Blender,
 // que no se exportan como agrupadores en el .glb, así que se listan a mano).
+// Se incluyen tanto los nombres viejos (FU - 001.00x) como los nuevos
+// (Panel N) para que funcione con cualquiera de las dos versiones del archivo.
 // "direccion" controla desde qué lado se aproxima la cámara al hacer zoom:
 // ajustá el signo de cada eje si la cámara llega "del lado incorrecto".
 const GRUPOS = {
     paneles: {
-        nombres: ["Panel 1", "Panel 2", "Panel 3", "Panel 4", "Panel 5", "Panel 6"],
+        base: [
+            "panel1", "panel2", "panel3", "panel4", "panel5", "panel6",
+            "fu001001", "fu001002", "fu001003", "fu001004", "fu001005", "fu001006"
+        ],
         direccion: new THREE.Vector3(1, 0.8, 1)
     },
     tableros: {
-        nombres: ["Inversor", "Medidor", "Protecciones CA", "Protecciones CC", "Tablero General"],
+        base: ["inversor", "medidor", "proteccionesca", "proteccionescc", "tablerogeneral"],
         direccion: new THREE.Vector3(-1, 0.8, -1)
     }
 };
 
 function grupoDe(nombre) {
 
+    const n = normalizar(nombre);
+
     for (const [clave, grupo] of Object.entries(GRUPOS)) {
 
-        if (grupo.nombres.includes(nombre)) return clave;
+        if (grupo.base.some((b) => n === b || n.startsWith(b))) return clave;
 
     }
 
     return null;
+
+}
+
+// Devuelve todas las mallas ya cargadas que pertenecen a un grupo
+function mallasDelGrupo(clave) {
+
+    return Object.keys(objetos).filter((nombre) => grupoDe(nombre) === clave);
 
 }
 
@@ -139,7 +162,7 @@ function enfocarGrupo(nombres, direccion) {
 
     if (encontrados === 0) {
 
-        console.warn(`enfocarGrupo: ninguno de estos objetos existe todavía: ${nombres.join(", ")} (¿el modelo ya terminó de cargar? revisá que el nombre coincida exactamente con la lista impresa arriba en consola)`);
+        console.warn(`enfocarGrupo: no se encontró ninguna malla para este grupo entre las cargadas. Nombres reales en el modelo: ${Object.keys(objetos).join(", ")}`);
         return;
 
     }
@@ -205,14 +228,14 @@ renderer.domElement.addEventListener("click", (event) => {
     if (clave === "paneles") {
 
         abrirImagen("img/paneles.png");
-        enfocarGrupo(GRUPOS.paneles.nombres, GRUPOS.paneles.direccion);
+        enfocarGrupo(mallasDelGrupo("paneles"), GRUPOS.paneles.direccion);
 
     }
 
     if (clave === "tableros") {
 
         abrirImagen("img/Protecciones.png");
-        enfocarGrupo(GRUPOS.tableros.nombres, GRUPOS.tableros.direccion);
+        enfocarGrupo(mallasDelGrupo("tableros"), GRUPOS.tableros.direccion);
 
     }
 
@@ -228,14 +251,14 @@ btnProtecciones.disabled = true;
 btnPaneles.onclick = () => {
 
     abrirImagen("img/paneles.png");
-    enfocarGrupo(GRUPOS.paneles.nombres, GRUPOS.paneles.direccion);
+    enfocarGrupo(mallasDelGrupo("paneles"), GRUPOS.paneles.direccion);
 
 };
 
 btnProtecciones.onclick = () => {
 
     abrirImagen("img/Protecciones.png");
-    enfocarGrupo(GRUPOS.tableros.nombres, GRUPOS.tableros.direccion);
+    enfocarGrupo(mallasDelGrupo("tableros"), GRUPOS.tableros.direccion);
 
 };
 
