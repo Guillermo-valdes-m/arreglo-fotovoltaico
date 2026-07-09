@@ -99,8 +99,7 @@ function enfocarObjeto(nombre) {
     const box = new THREE.Box3().setFromObject(obj);
     const centro = box.getCenter(new THREE.Vector3());
     const tamano = box.getSize(new THREE.Vector3());
-    const max=Math.max(tamano.x,tamano.y,tamano.z);
-    const radio=Math.max(max*4,3);
+    const radio = Math.max(tamano.length() * 0.6, 1);
 
     const direccion = new THREE.Vector3(1, 0.8, 1).normalize();
     const posDestino = centro.clone().add(direccion.multiplyScalar(radio));
@@ -114,7 +113,7 @@ function animarCamara(posDestino, targetDestino) {
 
     const posInicial = camera.position.clone();
     const targetInicial = controls.target.clone();
-    const duracion = 1200;
+    const duracion = 700;
     const inicio = performance.now();
 
     function paso(ahora) {
