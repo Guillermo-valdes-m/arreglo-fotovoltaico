@@ -16,7 +16,7 @@ const camera = new THREE.PerspectiveCamera(
     1000
 );
 
-camera.position.set(20, 20, 20);
+camera.position.set(3, 3, 3);
 
 // Render
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -47,7 +47,7 @@ const loader = new GLTFLoader();
 
 loader.load(
 
-    "modelo/Arreglo fotovoltaico.glb",
+    "modelo/Instalaciones_2.glb",
 
     (gltf) => {
 
@@ -68,7 +68,7 @@ loader.load(
 
                 objetos[obj.name] = obj;
 
-                if (obj.name === "Objeto.002") {
+                if (obj.name === "FU - 001.010") {
 
                     obj.material = obj.material.clone();
                     obj.material.emissive = new THREE.Color(0xffffff);
@@ -153,17 +153,17 @@ renderer.domElement.addEventListener("click", (event) => {
 
     console.log(nombre);
 
-    if (nombre === "Objeto") {
+    if (nombre === "FU - 001.006") {
 
         abrirImagen("img/paneles.png");
-        enfocarObjeto("Objeto");
+        enfocarObjeto("FU - 001.006");
 
     }
 
-    if (nombre === "Objeto.002") {
+    if (nombre === "FU - 001.010") {
 
         abrirImagen("img/Protecciones.png");
-        enfocarObjeto("Objeto.002");
+        enfocarObjeto("FU - 001.010");
 
     }
 
@@ -179,14 +179,14 @@ btnProtecciones.disabled = true;
 btnPaneles.onclick = () => {
 
     abrirImagen("img/paneles.png");
-    enfocarObjeto("Objeto");
+    enfocarObjeto("FU - 001.006");
 
 };
 
 btnProtecciones.onclick = () => {
 
     abrirImagen("img/Protecciones.png");
-    enfocarObjeto("Objeto.002");
+    enfocarObjeto("FU - 001.010");
 
 };
 
