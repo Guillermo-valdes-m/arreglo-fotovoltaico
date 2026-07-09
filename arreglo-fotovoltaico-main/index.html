@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visor Fotovoltaico</title>
+<link rel="stylesheet" href="style.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.166.1/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.166.1/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+
+  <div id="topbar">
+    <span class="dot"></span>
+    <b>Visor Fotovoltaico</b>
+    <span class="crumb">/</span>
+    <span>Arreglo Fotovoltaico · vista 3D</span>
+  </div>
+
+  <div id="body-layout">
+    <div id="mainRow">
+      <div id="sidebar">
+        <h2>Objetos del modelo</h2>
+        <button id="btnPaneles" data-code="OBJ·01">Arreglo Fotovoltaico</button>
+        <button id="btnProtecciones" data-code="OBJ·02">Protecciones</button>
+        <div class="hint">Clic en un objeto de la lista o directamente sobre el modelo 3D para ver su ficha técnica.</div>
+      </div>
+
+      <div id="viewer">
+        <div class="reticle tl"></div>
+        <div class="reticle tr"></div>
+        <div class="reticle bl"></div>
+        <div class="reticle br"></div>
+      </div>
+    </div>
+
+    <div id="infoPanel">
+      <div id="infoPanelHeader">
+        <span id="infoPanelCaption"></span>
+        <span id="close">&times;</span>
+      </div>
+      <img id="imagen">
+    </div>
+  </div>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>
